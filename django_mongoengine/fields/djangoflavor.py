@@ -2,15 +2,12 @@ from django.utils.text import capfirst
 from django.core.validators import RegexValidator
 from django import forms
 from django.db.models import Field
+from django.db.models.fields import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from mongoengine import fields
 
 from django_mongoengine.forms import fields as formfields
-
-
-class NOT_PROVIDED:
-    pass
 
 
 _field_defaults = (
