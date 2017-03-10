@@ -8,6 +8,11 @@ from mongoengine import fields
 
 from django_mongoengine.forms import fields as formfields
 
+
+class NOT_PROVIDED:
+    pass
+
+
 _field_defaults = (
     ("editable", True),
     ("blank", False),
@@ -15,7 +20,14 @@ _field_defaults = (
     ("verbose_name", None),
     ("help_text", None),
     ("auto_created", False),
+    ("default", NOT_PROVIDED),
+    ("empty_strings_allowed", True)
 )
+
+
+def return_None():
+    return None
+
 
 class DjangoField(object):
 
@@ -73,6 +85,25 @@ class DjangoField(object):
 
     def value_from_object(self, obj):
         return getattr(obj, self.name)
+
+    def has_default(self):
+        """Return a boolean of whether this field has a default value."""
+        return self.default is not NOT_PROVIDED
+
+    def get_default(self):
+        """Return the default value for this field."""
+        return self._get_default()
+
+    @cached_property
+    def _get_default(self):
+        if self.has_default():
+            if callable(self.default):
+                return self.default
+            return lambda: self.default
+
+        if not self.empty_strings_allowed or self.null:
+            return return_None
+        return str  # return empty string
 
     @cached_property
     def attname(self):
